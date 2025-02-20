@@ -11,4 +11,11 @@ class StudentController extends Controller
     {
         return response()->json(Student::all());
     }
+
+    public function search(Request $request) {
+        $search = $request->input('search'); 
+        $students = Student::where('name', 'LIKE', "%$search%")->get();
+    
+        return response()->json($students);
+    }
 }

@@ -13,4 +13,7 @@ Route::get('/student', [StudentController::class, 'student']);
 Route::get('/employee', [EmployeeController::class, 'employee']);
 
 
+Route::post('/search-employees', [EmployeeController::class, 'search']);
+Route::post('/search-students', [StudentController::class, 'search']);
+
 
