@@ -1,13 +1,15 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StudentLoginController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+});
 
 
 //Student
@@ -32,3 +34,5 @@ Route::get('/employee/search', [EmployeeController::class, 'search']);
 Route::get('/student/search', [StudentController::class, 'search']);
 
 
+//Login with token
+Route::post('/login', [AuthController::class, 'login']);
