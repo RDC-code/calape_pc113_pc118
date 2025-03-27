@@ -1,0 +1,36 @@
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+    padding-top: 20px;
+    overflow-y: auto; 
+}
+
+.sidebar .nav-link {
+    color: white;
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #495057;
+}
+
+/* Main Content */
+main {
+    margin-left: 260px; /* Push main content to the right */
+    padding: 20px;
+    width: calc(100% - 260px);
+}
+
+/* Ensure Horizontal Scrolling */
+html, body {
+    overflow-x: auto;
+    width: 100%;
+}
