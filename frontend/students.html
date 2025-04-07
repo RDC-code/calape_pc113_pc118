@@ -1,98 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Students</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="sidebar.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Students</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .sidebar { width: 200px; float: left; background: #f8f9fa; height: 100vh; padding-top: 20px; }
+    main { margin-left: 210px; padding: 20px; }
+  </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link" href="dashboard.html">Users</a></li>
-            <li class="nav-item"><a class="nav-link" href="employees.html">Employees</a></li>
-            <li class="nav-item"><a class="nav-link" href="students.html">Students</a></li>
-            <li class="nav-item"><a class="nav-link text-danger" href="index.php" id="logoutBtn">Logout</a></li>
-        </ul>
-    </nav>
+<!-- Sidebar -->
+<nav class="sidebar">
+  <ul class="nav flex-column">
+    <li class="nav-item"><a class="nav-link" href="dashboard.html">Users</a></li>
+    <li class="nav-item"><a class="nav-link" href="employees.html">Employees</a></li>
+    <li class="nav-item"><a class="nav-link" href="students.html">Students</a></li>
+    <li class="nav-item"><a class="nav-link text-danger" href="#" id="logoutBtn">Logout</a></li>
+  </ul>
+</nav>
 
-    <!-- Main Content -->
-    <main>
-        <h2 class="fw-bold text-primary">Students</h2>
-        <div class="table-responsive">
-            <table class="table table-hover" id="studentsTable">
-                <thead class="table-primary">
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </main>
+<!-- Main Content -->
+<main>
+  <h2 class="fw-bold text-primary">Students</h2>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-    
-            const currentPage = window.location.pathname.split("/").pop();
-            const navLinks = document.querySelectorAll(".nav-link");
+  <!-- Add/Edit Student Form -->
+  <form id="studentForm" class="mb-4">
+    <input type="hidden" id="studentId">
+    <div class="row g-2">
+      <div class="col-md-2"><input type="text" id="name" class="form-control" placeholder="Name" required></div>
+      <div class="col-md-2"><input type="email" id="email" class="form-control" placeholder="Email" required></div>
+      <div class="col-md-2"><input type="text" id="phone" class="form-control" placeholder="Phone" required></div>
+      <div class="col-md-3"><input type="text" id="address" class="form-control" placeholder="Address" required></div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-success w-100" id="formSubmitBtn">Add Student</button>
+      </div>
+    </div>
+  </form>
 
-            navLinks.forEach(link => {
-                if (link.getAttribute("href") === currentPage) {
-                    link.style.fontWeight = "bold"; 
-                }
-            });
+  <!-- Student Table -->
+  <div class="table-responsive">
+    <table class="table table-bordered" id="studentsTable">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
 
-            // Fetch Student Data
-            const token = localStorage.getItem("token");
-            const tableBody = document.querySelector("#studentsTable tbody");
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const token = localStorage.getItem("token");
+  const tableBody = document.querySelector("#studentsTable tbody");
+  const form = document.getElementById("studentForm");
+  const submitBtn = document.getElementById("formSubmitBtn");
 
-            if (!token) {
-                alert("Unauthorized access. Please log in.");
-                window.location.href = "index.php";
-                return;
-            }
+  if (!token) {
+    alert("Unauthorized access. Please log in.");
+    window.location.href = "index.php";
+    return;
+  }
 
-            fetch("http://127.0.0.1:8000/api/student", { 
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                tableBody.innerHTML = "";
-                data.forEach((student, index) => {
-                    tableBody.insertAdjacentHTML("beforeend", `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${student.name}</td>
-                            <td>${student.email}</td>
-                            <td>${student.phone}</td>
-                            <td>${student.address}</td>
-                        </tr>
-                    `);
-                });
-            })
-            .catch(error => {
-                alert("Failed to load student data. Please try again.");
-            });
+  fetchStudents();
 
-            // Logout Function
-            document.getElementById("logoutBtn").addEventListener("click", function () {
-                localStorage.removeItem("token");
-                window.location.href = "index.php";
-            });
-        });
-    </script>
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const id = document.getElementById("studentId").value;
+    if (id) {
+      updateStudent(id);
+    } else {
+      addStudent();
+    }
+  });
 
+  function fetchStudents() {
+    fetch("http://127.0.0.1:8000/api/student", {
+      headers: { "Authorization": "Bearer " + token }
+    })
+    .then(res => res.json())
+    .then(data => {
+      tableBody.innerHTML = "";
+      data.forEach((s, i) => {
+        tableBody.innerHTML += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${s.name}</td>
+            <td>${s.email}</td>
+            <td>${s.phone}</td>
+            <td>${s.address}</td>
+            <td>
+              <button class="btn btn-sm btn-warning me-1" onclick="editStudent(${s.id}, '${s.name}', '${s.email}', '${s.phone}', '${s.address}')">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteStudent(${s.id})">Delete</button>
+            </td>
+          </tr>`;
+      });
+    });
+  }
+
+  function addStudent() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const address = document.getElementById("address").value;
+
+    fetch("http://127.0.0.1:8000/api/student", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ name, email, phone, address })
+    })
+    .then(() => {
+      form.reset();
+      fetchStudents();
+    });
+  }
+
+  window.editStudent = function(id, name, email, phone, address) {
+    document.getElementById("studentId").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("email").value = email;
+    document.getElementById("phone").value = phone;
+    document.getElementById("address").value = address;
+    submitBtn.textContent = "Update Student";
+    submitBtn.classList.replace("btn-success", "btn-primary");
+  }
+
+  function updateStudent(id) {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const address = document.getElementById("address").value;
+
+    fetch(`http://127.0.0.1:8000/api/student/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ name, email, phone, address })
+    })
+    .then(() => {
+      form.reset();
+      document.getElementById("studentId").value = "";
+      submitBtn.textContent = "Add Student";
+      submitBtn.classList.replace("btn-primary", "btn-success");
+      fetchStudents();
+    });
+  }
+
+  window.deleteStudent = function(id) {
+    if (confirm("Are you sure you want to delete this student?")) {
+      fetch(`http://127.0.0.1:8000/api/student/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      }).then(() => fetchStudents());
+    }
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", function () {
+    localStorage.removeItem("token");
+    window.location.href = "index.php";
+  });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
