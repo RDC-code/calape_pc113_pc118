@@ -3,9 +3,24 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
+
+//users
+Route::get('/users', [UserController::class, 'users']);
+Route::put('/users/{id}', [UserController::class, 'update']);
+Route::get('/users/{id}', [UserController::class, 'show']);
+Route::delete('/users/{id}', [UserController::class, 'delete']);
+Route::post('/users', [UserController::class, 'store']);       
+
+
+
+
 
 
 
@@ -35,4 +50,3 @@ Route::get('/student/search', [StudentController::class, 'search']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum', 'role:0'])->get('/users', [AuthController::class, 'index']);
 Route::middleware(['auth:sanctum', 'role:1'])->get('/dashboard', [DashboardController::class, 'index']);
-;
