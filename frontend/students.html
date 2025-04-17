@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<!-- Sidebar -->
+<!-- Sidebar -->  
 <nav class="sidebar">
   <ul class="nav flex-column">
     <li class="nav-item"><a class="nav-link" href="dashboard.html">Users</a></li>
@@ -26,19 +26,31 @@
 <main>
   <h2 class="fw-bold text-primary">Students</h2>
 
-  <!-- Add/Edit Student Form -->
-  <form id="studentForm" class="mb-4">
-    <input type="hidden" id="studentId">
-    <div class="row g-2">
-      <div class="col-md-2"><input type="text" id="name" class="form-control" placeholder="Name" required></div>
-      <div class="col-md-2"><input type="email" id="email" class="form-control" placeholder="Email" required></div>
-      <div class="col-md-2"><input type="text" id="phone" class="form-control" placeholder="Phone" required></div>
-      <div class="col-md-3"><input type="text" id="address" class="form-control" placeholder="Address" required></div>
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-success w-100" id="formSubmitBtn">Add Student</button>
-      </div>
+  <!-- Add Student Button -->
+  <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#studentModal" onclick="openAddStudentModal()">+ Add Student</button>
+
+  <!-- Student Modal -->
+  <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="studentForm" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="studentModalLabel">Add Student</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="studentId">
+          <div class="mb-2"><input type="text" id="name" class="form-control" placeholder="Name" required></div>
+          <div class="mb-2"><input type="email" id="email" class="form-control" placeholder="Email" required></div>
+          <div class="mb-2"><input type="text" id="phone" class="form-control" placeholder="Phone" required></div>
+          <div class="mb-2"><input type="text" id="address" class="form-control" placeholder="Address" required></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success" id="formSubmitBtn">Add Student</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 
   <!-- Student Table -->
   <div class="table-responsive">
@@ -122,6 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify({ name, email, phone, address })
     })
     .then(() => {
+      alert("Student added successfully!"); // Window alert for success
       form.reset();
       fetchStudents();
     });
@@ -135,6 +148,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("address").value = address;
     submitBtn.textContent = "Update Student";
     submitBtn.classList.replace("btn-success", "btn-primary");
+
+    const modal = new bootstrap.Modal(document.getElementById("studentModal"));
+    modal.show();
   }
 
   function updateStudent(id) {
@@ -152,6 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify({ name, email, phone, address })
     })
     .then(() => {
+      alert("Student updated successfully!"); // Window alert for success
       form.reset();
       document.getElementById("studentId").value = "";
       submitBtn.textContent = "Add Student";
@@ -175,6 +192,14 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.removeItem("token");
     window.location.href = "index.php";
   });
+
+  window.openAddStudentModal = function () {
+    form.reset();
+    document.getElementById("studentId").value = "";
+    document.getElementById("studentModalLabel").textContent = "Add Student";
+    document.getElementById("formSubmitBtn").textContent = "Add Student";
+    document.getElementById("formSubmitBtn").className = "btn btn-success";
+  }
 });
 </script>
 

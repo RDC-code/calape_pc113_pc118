@@ -13,7 +13,7 @@
       height: 100vh; 
       padding-top: 20px; 
     }
-    main { 
+    main {  
       margin-left: 210px; 
       padding: 20px; 
     }
@@ -38,20 +38,32 @@
 <main>
   <h2 class="fw-bold text-primary">Employees</h2>
 
-  <!-- Add/Edit Employee Form -->
-  <form id="employeeForm" class="mb-4">
-    <input type="hidden" id="employeeId">
-    <div class="row g-2">
-      <div class="col-md-2"><input type="text" id="name" class="form-control" placeholder="Name" required></div>
-      <div class="col-md-2"><input type="email" id="email" class="form-control" placeholder="Email" required></div>
-      <div class="col-md-2"><input type="text" id="phone" class="form-control" placeholder="Phone" required></div>
-      <div class="col-md-3"><input type="text" id="position" class="form-control" placeholder="Position" required></div>
-      <div class="col-md-2"><input type="number" id="salary" class="form-control" placeholder="Salary" required></div>
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-success w-100" id="formSubmitBtn">Add Employee</button>
-      </div>
+  <!-- Add Employee Button -->
+  <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#employeeModal" onclick="openAddEmployeeModal()">+ Add Employee</button>
+
+  <!-- Employee Modal -->
+  <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="employeeForm" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="employeeModalLabel">Add Employee</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="employeeId">
+          <div class="mb-2"><input type="text" id="name" class="form-control" placeholder="Name" required></div>
+          <div class="mb-2"><input type="email" id="email" class="form-control" placeholder="Email" required></div>
+          <div class="mb-2"><input type="text" id="phone" class="form-control" placeholder="Phone" required></div>
+          <div class="mb-2"><input type="text" id="position" class="form-control" placeholder="Position" required></div>
+          <div class="mb-2"><input type="number" id="salary" class="form-control" placeholder="Salary" required></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success" id="formSubmitBtn">Add Employee</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 
   <!-- Employee Table -->
   <div class="table-responsive">
@@ -73,8 +85,6 @@
 </main>
 
 <script>
-
-
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("token");
   const tableBody = document.querySelector("#employeeTable tbody");
@@ -140,7 +150,9 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify({ name, email, phone, position, salary })
     })
     .then(() => {
+      window.alert("Employee added successfully!");
       form.reset();
+      bootstrap.Modal.getInstance(document.getElementById("employeeModal")).hide();
       fetchEmployees();
     });
   }
@@ -152,8 +164,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("phone").value = phone;
     document.getElementById("position").value = position;
     document.getElementById("salary").value = salary;
-    submitBtn.textContent = "Update Employee";
-    submitBtn.classList.replace("btn-success", "btn-primary");
+    document.getElementById("employeeModalLabel").textContent = "Edit Employee";
+    document.getElementById("formSubmitBtn").textContent = "Update Employee";
+    document.getElementById("formSubmitBtn").className = "btn btn-primary";
+
+    const modal = new bootstrap.Modal(document.getElementById("employeeModal"));
+    modal.show();
   }
 
   function updateEmployee(id) {
@@ -172,10 +188,12 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify({ name, email, phone, position, salary })
     })
     .then(() => {
+      window.alert("Employee updated successfully!");
       form.reset();
       document.getElementById("employeeId").value = "";
       submitBtn.textContent = "Add Employee";
-      submitBtn.classList.replace("btn-primary", "btn-success");
+      submitBtn.className = "btn btn-success";
+      bootstrap.Modal.getInstance(document.getElementById("employeeModal")).hide();
       fetchEmployees();
     });
   }
@@ -189,6 +207,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }).then(() => fetchEmployees());
     }
+  }
+
+  window.openAddEmployeeModal = function () {
+    form.reset();
+    document.getElementById("employeeId").value = "";
+    document.getElementById("employeeModalLabel").textContent = "Add Employee";
+    document.getElementById("formSubmitBtn").textContent = "Add Employee";
+    document.getElementById("formSubmitBtn").className = "btn btn-success";
   }
 
   document.getElementById("logoutBtn").addEventListener("click", function () {
